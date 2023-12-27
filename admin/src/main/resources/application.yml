@@ -15,6 +15,6 @@ spring:
       minimum-idle: 5
   data:
     redis:
-      host: 127.0.0.1
+      host: 192.168.61.130
       port: 6379
       password: 198106.lbj.
