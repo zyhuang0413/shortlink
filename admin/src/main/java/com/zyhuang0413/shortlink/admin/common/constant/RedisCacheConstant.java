@@ -9,5 +9,6 @@ package com.zyhuang0413.shortlink.admin.common.constant;
 public class RedisCacheConstant {
 
     public static final String LOCK_USER_REGISTER_KEY = "short-link:lock_user_register_key:";
+    public static final String LOGIN_USER_KEY = "short-link:login_user_key:";
 
 }
