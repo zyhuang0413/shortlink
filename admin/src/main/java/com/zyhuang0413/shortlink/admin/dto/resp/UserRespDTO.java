@@ -2,6 +2,7 @@ package com.zyhuang0413.shortlink.admin.dto.resp;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.zyhuang0413.shortlink.admin.common.serialize.PhoneDesensitizationSerializer;
+import com.zyhuang0413.shortlink.admin.common.serialize.RealNameDesensitizationSerializer;
 import lombok.Data;
 
 /**
@@ -26,6 +27,7 @@ public class UserRespDTO {
     /**
      * 真实姓名
      */
+    @JsonSerialize(using = RealNameDesensitizationSerializer.class)
     private String realName;
 
     /**
