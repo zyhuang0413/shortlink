@@ -2,11 +2,14 @@ package com.zyhuang0413.shortlink.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.zyhuang0413.shortlink.admin.common.biz.user.UserContext;
 import com.zyhuang0413.shortlink.admin.dao.entity.GroupDO;
 import com.zyhuang0413.shortlink.admin.dao.mapper.GroupMapper;
 import com.zyhuang0413.shortlink.admin.dto.req.ShortLinkGroupSaveReqDTO;
+import com.zyhuang0413.shortlink.admin.dto.req.ShortLinkGroupUpdateReqDTO;
 import com.zyhuang0413.shortlink.admin.dto.resp.ShortLinkGroupQueryRespDTO;
 import com.zyhuang0413.shortlink.admin.service.GroupService;
 import com.zyhuang0413.shortlink.admin.tookit.RandomGenerator;
@@ -34,6 +37,7 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
         GroupDO groupDO = GroupDO.builder()
                 .gid(gid)
                 .name(requestParam.getName())
+                .username(UserContext.getUsername())
                 .sortOrder(0)
                 .build();
         baseMapper.insert(groupDO);
@@ -41,19 +45,28 @@ public class GroupServiceImpl extends ServiceImpl<GroupMapper, GroupDO> implemen
 
     @Override
     public List<ShortLinkGroupQueryRespDTO> listGroup() {
-        // TODO 从当前上下文中获取用户名
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getDelFlag, 0)
-                .eq(GroupDO::getUsername, "zyhuang")
+                .eq(GroupDO::getUsername, UserContext.getUsername())
                 .orderByDesc(GroupDO::getSortOrder, GroupDO::getUpdateTime);
         return BeanUtil.copyToList(baseMapper.selectList(queryWrapper), ShortLinkGroupQueryRespDTO.class);
+    }
+
+    @Override
+    public void updateGroup(ShortLinkGroupUpdateReqDTO requestParam) {
+        LambdaUpdateWrapper<GroupDO> updateWrapper = Wrappers.lambdaUpdate(GroupDO.class)
+                .eq(GroupDO::getDelFlag, 0)
+                .eq(GroupDO::getUsername, UserContext.getUsername())
+                .eq(GroupDO::getGid, requestParam.getGid());
+        GroupDO groupDO = new GroupDO();
+        groupDO.setName(requestParam.getName());
+        baseMapper.update(groupDO, updateWrapper);
     }
 
     private boolean availableGroupId(String gid) {
         LambdaQueryWrapper<GroupDO> queryWrapper = Wrappers.lambdaQuery(GroupDO.class)
                 .eq(GroupDO::getGid, gid)
-                // TODO 设置用户名
-                .eq(GroupDO::getUsername, null);
+                .eq(GroupDO::getUsername, UserContext.getUsername());
         return baseMapper.selectOne(queryWrapper) == null;
     }
 
